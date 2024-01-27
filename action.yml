@@ -1,0 +1,24 @@
+name: 'Hashnode publishing Action'
+description: 'Publishing blogs to hashnodel'
+author: 'Karthikeyan <imkarthikeyans@gmail.com>'
+
+# inputs:
+#   GITHUB_TOKEN:
+#     description: 'GitHub token'
+#     required: true
+#   PERSONAL_ACCESS_TOKEN:
+#     description: 'Hashnode Personal Access token'
+#     required: true
+#   PUBLICATION_ID: 
+#     description: 'Publication id'
+#     required: true
+#   CUSTOM_DIR:
+#     description: 'Directory where the blogs resides in , defaults to root dir'
+#     required: false
+
+branding:
+  icon: 'activity'
+  color: 'green'
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
