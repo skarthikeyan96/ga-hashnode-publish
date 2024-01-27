@@ -1,8 +1,8 @@
 name: "Post blog to hashnode"
 
 on:
-  pull_request:
-    types: [opened, reopened]
+  push:
+    branches: [ "main" ]
    
 jobs:
   hello:
@@ -10,3 +10,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./
+        with:
+          gh-token: ${{secrets.GITHUB_TOKEN}}
