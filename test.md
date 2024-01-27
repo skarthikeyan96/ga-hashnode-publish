@@ -1,5 +1,5 @@
 ---
-title: My First Blog 
+title: My First Blog test
 subtitle: Article subtitle
 publishedAt: # generated during runtime
 publicationId: # pass it on the action as env variable
