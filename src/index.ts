@@ -22,7 +22,7 @@ const run = async () => {
 });
 
 
-  console.log(context.payload);
+//   console.log(context.payload);
 
   const commitHash = execSync("git rev-parse HEAD").toString().trim();
 
