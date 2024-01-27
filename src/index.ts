@@ -39,13 +39,13 @@ const run = async () => {
       console.log("gping in");
       const data = commitResponse.data;
 
-      console.log(data);
+    //   console.log(data);
       // Filter and fetch the content of Markdown files
       const markdownFiles = data.files.filter(
         (file: { filename: string }) =>
           file.filename.endsWith(".md") || file.filename.endsWith(".mdx")
       );
-      console.log(markdownFiles);
+    //   console.log(markdownFiles);
       for (const file of markdownFiles) {
         const filePath = file.filename;
 
@@ -84,7 +84,6 @@ const parseMdxFileContent = (fileContent: any) => {
     subtitle,
     tags: [],
   } = data;
-  console.log(data);
 
   // parse the content and make it ready for sending to hashnode's server
 

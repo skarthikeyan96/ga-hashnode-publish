@@ -37,10 +37,10 @@ const run = async () => {
         if (commitResponse.status === 200) {
             console.log("gping in");
             const data = commitResponse.data;
-            console.log(data);
+            //   console.log(data);
             // Filter and fetch the content of Markdown files
             const markdownFiles = data.files.filter((file) => file.filename.endsWith(".md") || file.filename.endsWith(".mdx"));
-            console.log(markdownFiles);
+            //   console.log(markdownFiles);
             for (const file of markdownFiles) {
                 const filePath = file.filename;
                 const fileContentResponse = await axios_1.default.get(`https://raw.githubusercontent.com/skarthikeyan96/ga-hashnode-publish/${commitHash}/${filePath}`);
@@ -66,7 +66,6 @@ const run = async () => {
 const parseMdxFileContent = (fileContent) => {
     const { data, content } = (0, gray_matter_1.default)(fileContent);
     const { title, subtitle, tags: [], } = data;
-    console.log(data);
     // parse the content and make it ready for sending to hashnode's server
     const mutation = (0, graphql_request_1.gql) `
     mutation PublishPost($input: PublishPostInput!) {
