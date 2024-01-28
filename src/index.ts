@@ -16,11 +16,10 @@ const run = async () => {
   const octokit = getOctokit(gh_token);
 
   const graphqlClient = new GraphQLClient("https://gql.hashnode.com/", {
-  headers: {
-    Authorization: hashnode_personal_access_token || "",
-  },
-});
-
+    headers: {
+      Authorization: hashnode_personal_access_token || "",
+    },
+  });
 
   console.log(context.payload);
 
@@ -29,9 +28,7 @@ const run = async () => {
   try {
     // axios.defaults.headers.common['Authorization'] = `Bearer ${process.env.ENV_GITHUB_TOKEN}`;
 
-    const commitResponse = await axios.get(
-      `https://api.github.com/repos/skarthikeyan96/ga-hashnode-publish/commits/${commitHash}`
-    );
+    const commitResponse = await axios.get(context.payload.commits[0].url);
 
     // console.log(`https://api.github.com/repos/${repoOwner}/${repoName}/commits/${commitHash}`)
     // console.log(commitResponse)
@@ -39,13 +36,13 @@ const run = async () => {
       console.log("gping in");
       const data = commitResponse.data;
 
-    //   console.log(data);
+      //   console.log(data);
       // Filter and fetch the content of Markdown files
       const markdownFiles = data.files.filter(
         (file: { filename: string }) =>
           file.filename.endsWith(".md") || file.filename.endsWith(".mdx")
       );
-    //   console.log(markdownFiles);
+      //   console.log(markdownFiles);
       for (const file of markdownFiles) {
         const filePath = file.filename;
 
@@ -101,14 +98,14 @@ const parseMdxFileContent = (fileContent: any) => {
   `;
 
   const variables = {
-    "input" : {
-      "title":  title, // spread the entire front matter
-      "publicationId": "5faeafa108f9e538a0136e73", // needs to be constant
-      "tags": [],
-      "contentMarkdown": content
-    }
-  }
-  console.log(variables)
+    input: {
+      title: title, // spread the entire front matter
+      publicationId: "5faeafa108f9e538a0136e73", // needs to be constant
+      tags: [],
+      contentMarkdown: content,
+    },
+  };
+  console.log(variables);
 
   // const results = await graphqlClient.request(mutation, variables);
   // console.log(results)

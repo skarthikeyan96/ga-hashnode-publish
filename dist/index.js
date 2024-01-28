@@ -27,7 +27,7 @@ const run = async () => {
             Authorization: hashnode_personal_access_token || "",
         },
     });
-    console.log(github_1.context.payload);
+    console.log(github_1.context.payload.commits[0].url);
     const commitHash = (0, child_process_1.execSync)("git rev-parse HEAD").toString().trim();
     try {
         // axios.defaults.headers.common['Authorization'] = `Bearer ${process.env.ENV_GITHUB_TOKEN}`;
