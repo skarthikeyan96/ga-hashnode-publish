@@ -34,11 +34,13 @@ const run = async () => {
         const commitResponse = await axios_1.default.get(github_1.context.payload.commits[0].url);
         if (commitResponse.status === 200) {
             const data = commitResponse.data;
+            console.log(data);
+            console.log("blog path", blog_custom_dir);
             const markdownFiles = data.files.filter((file) => file.filename.endsWith(".md") || file.filename.endsWith(".mdx"));
             for (const file of markdownFiles) {
                 const filePath = file.filename;
                 console.log("filePath", filePath);
-                const fileContentResponse = await axios_1.default.get(`https://raw.githubusercontent.com/${username}/${reponame}/${commitHash}/${filePath}`);
+                const fileContentResponse = await axios_1.default.get(`https://raw.githubusercontent.com/skarthikeyan96/ga-hashnode-publish/${commitHash}/${filePath}`);
                 if (fileContentResponse.status === 200) {
                     const fileContent = fileContentResponse.data;
                     parseMdxFileContent(fileContent);

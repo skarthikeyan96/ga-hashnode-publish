@@ -32,6 +32,8 @@ const run = async () => {
     if (commitResponse.status === 200) {
       const data = commitResponse.data;
 
+      console.log(data)
+      console.log("blog path", blog_custom_dir)
       const markdownFiles = data.files.filter(
         (file: { filename: string }) =>
           file.filename.endsWith(".md") || file.filename.endsWith(".mdx")
@@ -41,7 +43,7 @@ const run = async () => {
 
         console.log("filePath", filePath)
         const fileContentResponse = await axios.get(
-          `https://raw.githubusercontent.com/${username}/${reponame}/${commitHash}/${filePath}`
+          `https://raw.githubusercontent.com/skarthikeyan96/ga-hashnode-publish/${commitHash}/${filePath}`
         );
 
         if (fileContentResponse.status === 200) {
