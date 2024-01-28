@@ -27,12 +27,11 @@ const run = async () => {
     const commitUrl = context.payload.commits[0].url;
     const username  = commitUrl.split('/')[2]
     const reponame = commitUrl.split('/')[3]
-    const commitResponse = await axios.get(context.payload.commits[0].url);
+    const commitResponse = await axios.get(`https://api.github.com/repos/skarthikeyan96/ga-hashnode-publish/commits/${commitHash}`);
 
     if (commitResponse.status === 200) {
       const data = commitResponse.data;
 
-      console.log(data)
       console.log("blog path", blog_custom_dir)
       const markdownFiles = data.files.filter(
         (file: { filename: string }) =>
