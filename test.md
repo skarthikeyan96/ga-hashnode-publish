@@ -13,7 +13,7 @@ disableComments: false # by default it will be false ( can change it in the acti
 
 ## Sunt poscat adflatuque manibus Marte
 
-Lorem markdownum, candens: inclitus arma solida? asds
+Lorem markdownum, candens: inclitus arma solida?
 [Lumina](http://fluctus-exstimulat.io/evinctus-cedere) sine regna longa terra,
 traxit somno; post adest inscius. Tulit qui deus postes situs et ne aera, quem
 laborat dignatur omnibus. Parenti admonitu ut torum, ex in

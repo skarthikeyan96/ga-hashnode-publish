@@ -12,9 +12,9 @@ inputs:
   # hashnode-publication-id: 
   #   description: 'Publication id'
   #   required: true
-  # blog-custom-dir:
-  #   description: 'Directory where the blogs resides in , defaults to root dir'
-  #   required: false
+  blog-custom-dir:
+    description: 'Directory where the blogs resides in , defaults to root dir'
+    required: false
 
 branding:
   icon: 'activity'

@@ -12,3 +12,4 @@ jobs:
       - uses: ./
         with:
           gh-token: ${{secrets.GITHUB_TOKEN}}
+          blog-custom-dir: "/blog"

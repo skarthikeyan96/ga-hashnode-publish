@@ -21,34 +21,27 @@ const run = async () => {
     const hashnode_personal_access_token = (0, core_1.getInput)("hashnode-personal-access-token");
     const hashnode_publication_id = (0, core_1.getInput)("hashnode-publication-id");
     const blog_custom_dir = (0, core_1.getInput)("blog-custom-dir");
-    const octokit = (0, github_1.getOctokit)(gh_token);
     const graphqlClient = new graphql_request_1.GraphQLClient("https://gql.hashnode.com/", {
         headers: {
             Authorization: hashnode_personal_access_token || "",
         },
     });
-    console.log(github_1.context.payload);
     const commitHash = (0, child_process_1.execSync)("git rev-parse HEAD").toString().trim();
     try {
-        // axios.defaults.headers.common['Authorization'] = `Bearer ${process.env.ENV_GITHUB_TOKEN}`;
+        const commitUrl = github_1.context.payload.commits[0].url;
+        const username = commitUrl.split('/')[2];
+        const reponame = commitUrl.split('/')[3];
         const commitResponse = await axios_1.default.get(github_1.context.payload.commits[0].url);
-        // console.log(`https://api.github.com/repos/${repoOwner}/${repoName}/commits/${commitHash}`)
-        // console.log(commitResponse)
         if (commitResponse.status === 200) {
-            console.log("gping in");
             const data = commitResponse.data;
-            //   console.log(data);
-            // Filter and fetch the content of Markdown files
             const markdownFiles = data.files.filter((file) => file.filename.endsWith(".md") || file.filename.endsWith(".mdx"));
-            //   console.log(markdownFiles);
             for (const file of markdownFiles) {
                 const filePath = file.filename;
-                const fileContentResponse = await axios_1.default.get(`https://raw.githubusercontent.com/skarthikeyan96/ga-hashnode-publish/${commitHash}/${filePath}`);
+                console.log("filePath", filePath);
+                const fileContentResponse = await axios_1.default.get(`https://raw.githubusercontent.com/${username}/${reponame}/${commitHash}/${filePath}`);
                 if (fileContentResponse.status === 200) {
                     const fileContent = fileContentResponse.data;
-                    //   await fs.writeFile(filePath, fileContent, 'utf-8');
                     parseMdxFileContent(fileContent);
-                    // console.log(`Content of ${filePath}:\n${fileContent}`);
                 }
                 else {
                     console.error(`Failed to fetch content of ${filePath}:`, fileContentResponse.statusText);
@@ -87,7 +80,7 @@ const parseMdxFileContent = (fileContent) => {
             contentMarkdown: content,
         },
     };
-    console.log(variables);
+    console.log(title);
     // const results = await graphqlClient.request(mutation, variables);
     // console.log(results)
 };

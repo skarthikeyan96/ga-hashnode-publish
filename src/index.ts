@@ -13,7 +13,6 @@ const run = async () => {
   const hashnode_publication_id = getInput("hashnode-publication-id");
   const blog_custom_dir = getInput("blog-custom-dir");
 
-  const octokit = getOctokit(gh_token);
 
   const graphqlClient = new GraphQLClient("https://gql.hashnode.com/", {
     headers: {
@@ -21,40 +20,33 @@ const run = async () => {
     },
   });
 
-  console.log(context.payload);
 
   const commitHash = execSync("git rev-parse HEAD").toString().trim();
 
   try {
-    // axios.defaults.headers.common['Authorization'] = `Bearer ${process.env.ENV_GITHUB_TOKEN}`;
-
+    const commitUrl = context.payload.commits[0].url;
+    const username  = commitUrl.split('/')[2]
+    const reponame = commitUrl.split('/')[3]
     const commitResponse = await axios.get(context.payload.commits[0].url);
 
-    // console.log(`https://api.github.com/repos/${repoOwner}/${repoName}/commits/${commitHash}`)
-    // console.log(commitResponse)
     if (commitResponse.status === 200) {
-      console.log("gping in");
       const data = commitResponse.data;
 
-      //   console.log(data);
-      // Filter and fetch the content of Markdown files
       const markdownFiles = data.files.filter(
         (file: { filename: string }) =>
           file.filename.endsWith(".md") || file.filename.endsWith(".mdx")
       );
-      //   console.log(markdownFiles);
       for (const file of markdownFiles) {
         const filePath = file.filename;
 
+        console.log("filePath", filePath)
         const fileContentResponse = await axios.get(
-          `https://raw.githubusercontent.com/skarthikeyan96/ga-hashnode-publish/${commitHash}/${filePath}`
+          `https://raw.githubusercontent.com/${username}/${reponame}/${commitHash}/${filePath}`
         );
 
         if (fileContentResponse.status === 200) {
           const fileContent = fileContentResponse.data;
-          //   await fs.writeFile(filePath, fileContent, 'utf-8');
           parseMdxFileContent(fileContent);
-          // console.log(`Content of ${filePath}:\n${fileContent}`);
         } else {
           console.error(
             `Failed to fetch content of ${filePath}:`,
@@ -105,7 +97,7 @@ const parseMdxFileContent = (fileContent: any) => {
       contentMarkdown: content,
     },
   };
-  console.log(variables);
+  console.log(title);
 
   // const results = await graphqlClient.request(mutation, variables);
   // console.log(results)
