@@ -32,14 +32,14 @@ const run = async () => {
         const username = commitUrl.split('/')[2];
         const reponame = commitUrl.split('/')[3];
         const commitResponse = await axios_1.default.get(`https://api.github.com/repos/skarthikeyan96/ga-hashnode-publish/commits/${commitHash}`);
+        const customBlogPath = `${blog_custom_dir}/` || "";
         if (commitResponse.status === 200) {
             const data = commitResponse.data;
-            console.log("blog path", blog_custom_dir);
             const markdownFiles = data.files.filter((file) => file.filename.endsWith(".md") || file.filename.endsWith(".mdx"));
             for (const file of markdownFiles) {
                 const filePath = file.filename;
                 console.log("filePath", filePath);
-                const fileContentResponse = await axios_1.default.get(`https://raw.githubusercontent.com/skarthikeyan96/ga-hashnode-publish/${commitHash}/${filePath}`);
+                const fileContentResponse = await axios_1.default.get(`https://raw.githubusercontent.com/skarthikeyan96/ga-hashnode-publish/${commitHash}/${customBlogPath}${filePath}`);
                 if (fileContentResponse.status === 200) {
                     const fileContent = fileContentResponse.data;
                     parseMdxFileContent(fileContent);
