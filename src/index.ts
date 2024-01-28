@@ -5,30 +5,32 @@ import axios from "axios";
 import grayMatter from "gray-matter";
 import { GraphQLClient, gql } from "graphql-request";
 
+const hashnode_personal_access_token = getInput(
+  "hashnode-personal-access-token"
+);
+const graphqlClient = new GraphQLClient("https://gql.hashnode.com/", {
+  headers: {
+    Authorization: hashnode_personal_access_token || "",
+  },
+});
+
 const run = async () => {
-  const gh_token = getInput("gh-token");
-  const hashnode_personal_access_token = getInput(
-    "hashnode-personal-access-token"
-  );
+//   const gh_token = getInput("gh-token");
+
   const hashnode_publication_id = getInput("hashnode-publication-id");
   const blog_custom_dir = getInput("blog-custom-dir");
-
-
-  const graphqlClient = new GraphQLClient("https://gql.hashnode.com/", {
-    headers: {
-      Authorization: hashnode_personal_access_token || "",
-    },
-  });
-
 
   const commitHash = execSync("git rev-parse HEAD").toString().trim();
 
   try {
-    const commitUrl = context.payload.commits[0].url;
-    const username  = commitUrl.split('/')[2]
-    const reponame = commitUrl.split('/')[3]
-    const commitResponse = await axios.get(`https://api.github.com/repos/skarthikeyan96/ga-hashnode-publish/commits/${commitHash}`);
-    const customBlogPath = `${blog_custom_dir}/` || ""
+    // const commitUrl = context.payload.commits[0].url;
+    // const username = commitUrl.split("/")[2];
+    // const reponame = commitUrl.split("/")[3];
+    // 
+    const commitResponse = await axios.get(
+      `https://api.github.com/repos/skarthikeyan96/ga-hashnode-publish/commits/${commitHash}`
+    );
+    const customBlogPath = `${blog_custom_dir}/` || "";
 
     if (commitResponse.status === 200) {
       const data = commitResponse.data;
@@ -40,7 +42,7 @@ const run = async () => {
       for (const file of markdownFiles) {
         const filePath = file.filename;
 
-        console.log("filePath", filePath)
+        console.log("filePath", filePath);
         const fileContentResponse = await axios.get(
           `https://raw.githubusercontent.com/skarthikeyan96/ga-hashnode-publish/${commitHash}/${customBlogPath}${filePath}`
         );
@@ -66,7 +68,7 @@ const run = async () => {
   }
 };
 
-const parseMdxFileContent = (fileContent: any) => {
+const parseMdxFileContent = async (fileContent: any) => {
   const { data, content } = grayMatter(fileContent);
 
   const {
@@ -98,10 +100,11 @@ const parseMdxFileContent = (fileContent: any) => {
       contentMarkdown: content,
     },
   };
+
   console.log(title);
 
-  // const results = await graphqlClient.request(mutation, variables);
-  // console.log(results)
+  const results = await graphqlClient.request(mutation, variables);
+  console.log(results);
 };
 
 run();
