@@ -27,11 +27,11 @@ const run = async () => {
             Authorization: hashnode_personal_access_token || "",
         },
     });
-    console.log(github_1.context.payload.commits[0].url);
+    console.log(github_1.context.payload);
     const commitHash = (0, child_process_1.execSync)("git rev-parse HEAD").toString().trim();
     try {
         // axios.defaults.headers.common['Authorization'] = `Bearer ${process.env.ENV_GITHUB_TOKEN}`;
-        const commitResponse = await axios_1.default.get(`https://api.github.com/repos/skarthikeyan96/ga-hashnode-publish/commits/${commitHash}`);
+        const commitResponse = await axios_1.default.get(github_1.context.payload.commits[0].url);
         // console.log(`https://api.github.com/repos/${repoOwner}/${repoName}/commits/${commitHash}`)
         // console.log(commitResponse)
         if (commitResponse.status === 200) {
@@ -80,12 +80,12 @@ const parseMdxFileContent = (fileContent) => {
     }
   `;
     const variables = {
-        "input": {
-            "title": title, // spread the entire front matter
-            "publicationId": "5faeafa108f9e538a0136e73", // needs to be constant
-            "tags": [],
-            "contentMarkdown": content
-        }
+        input: {
+            title: title, // spread the entire front matter
+            publicationId: "5faeafa108f9e538a0136e73", // needs to be constant
+            tags: [],
+            contentMarkdown: content,
+        },
     };
     console.log(variables);
     // const results = await graphqlClient.request(mutation, variables);
