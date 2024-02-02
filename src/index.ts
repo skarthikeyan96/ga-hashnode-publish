@@ -30,7 +30,7 @@ const run = async () => {
 
     console.log("payload", context.payload.pull_request)
 
-    
+
     const commitResponse = await axios.get(
       `https://api.github.com/repos/skarthikeyan96/ga-hashnode-publish/commits/${commitHash}`
     );
@@ -53,6 +53,7 @@ const run = async () => {
 
         if (fileContentResponse.status === 200) {
           const fileContent = fileContentResponse.data;
+          console.log("fileContent", fileContent)
           parseMdxFileContent(fileContent);
         } else {
           console.error(
