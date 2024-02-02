@@ -2,7 +2,9 @@ name: "Post blog to hashnode"
 
 on:
   pull_request:
-      types: ["opened"]
+      types: ["opened", "edited"]
+      paths:
+        - '**.md'
    
 jobs:
   hello:

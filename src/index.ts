@@ -27,6 +27,10 @@ const run = async () => {
     // const username = commitUrl.split("/")[2];
     // const reponame = commitUrl.split("/")[3];
     // 
+
+    console.log("payload", context.payload.pull_request)
+
+    
     const commitResponse = await axios.get(
       `https://api.github.com/repos/skarthikeyan96/ga-hashnode-publish/commits/${commitHash}`
     );

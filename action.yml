@@ -6,9 +6,9 @@ inputs:
   gh-token:
     description: 'GitHub token'
     required: true
-  # hashnode-personal-access-token:
-  #   description: 'Hashnode Personal Access token'
-  #   required: true
+  hashnode-personal-access-token:
+    description: 'Hashnode Personal Access token'
+    required: true
   # hashnode-publication-id: 
   #   description: 'Publication id'
   #   required: true
