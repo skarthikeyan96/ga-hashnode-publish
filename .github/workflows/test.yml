@@ -1,15 +1,18 @@
 name: "Post blog to hashnode"
 
-on:
-  pull_request:
-      paths:
-        - 'blogs/**.md'
+on: pull_request
    
 jobs:
   hello:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v2.2.1
+        id: filter
+        with:
+          filters: |
+            md:
+              - '**/*.md'
       - uses: ./
         with:
           gh-token: ${{secrets.GITHUB_TOKEN}}
