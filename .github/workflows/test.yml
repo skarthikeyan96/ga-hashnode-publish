@@ -1,8 +1,8 @@
 name: "Post blog to hashnode"
 
 on:
-  push:
-    branches: [ "main" ]
+  pull_request:
+      types: ["opened"]
    
 jobs:
   hello:
