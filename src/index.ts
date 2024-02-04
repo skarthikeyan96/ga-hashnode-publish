@@ -12,13 +12,13 @@ const hashnode_publication_id = getInput("hashnode-publication-id");
 const blog_custom_dir = getInput("blog-custom-dir");
 
 const run = async () => {
-  console.log("hello world")
-  if(!hashnode_personal_access_token){
-    setFailed("Please add your hashnode personal access token")
+  console.log("hello world");
+  if (!hashnode_personal_access_token) {
+    setFailed("Please add your hashnode personal access token");
     return;
   }
-  if(!hashnode_publication_id){
-    setFailed("Please add your hashnode publication id")
+  if (!hashnode_publication_id) {
+    setFailed("Please add your hashnode publication id");
     return;
   }
   // getting the latest commit
@@ -26,12 +26,12 @@ const run = async () => {
 
   try {
     const username = context?.payload?.pull_request?.user?.login;
-    const reponame = context?.payload?.repository?.name
+    const reponame = context?.payload?.repository?.name;
     const commitResponse = await axios.get(
       `https://api.github.com/repos/${username}/${reponame}/commits/${commitHash}`
     );
     const customBlogPath = `${blog_custom_dir}/` || "";
-    
+
     if (commitResponse.status === 200) {
       const data = commitResponse.data;
 
@@ -40,9 +40,9 @@ const run = async () => {
           file.filename.endsWith(".md") || file.filename.endsWith(".mdx")
       );
 
-      console.log("markdownFiles", markdownFiles)
-      
-      if(!markdownFiles.length){
+      console.log("markdownFiles", markdownFiles);
+
+      if (!markdownFiles.length) {
         setFailed("There are no markdown files in this commit");
         return;
       }
@@ -55,37 +55,36 @@ const run = async () => {
         //   return;
         // }
 
-        const fileContentResponse = await axios.get(
-          `https://raw.githubusercontent.com/skarthikeyan96/ga-hashnode-publish/${commitHash}/${customBlogPath}${filePath}`
-        );
-
-        if (fileContentResponse.status === 200) {
-          const fileContent = fileContentResponse.data;
-          console.log("fileContent", fileContent)
-          parseMdxFileContent(fileContent);
-        } else {
-          console.error(
-            `Failed to fetch content of ${filePath}:`,
-            fileContentResponse.statusText
+        if (filePath !== "README.md") {
+          // later create whitelist file
+          const fileContentResponse = await axios.get(
+            `https://raw.githubusercontent.com/skarthikeyan96/ga-hashnode-publish/${commitHash}/${customBlogPath}${filePath}`
           );
+
+          if (fileContentResponse.status === 200) {
+            const fileContent = fileContentResponse.data;
+            console.log("fileContent", fileContent);
+            parseMdxFileContent(fileContent);
+          } else {
+            console.error(
+              `Failed to fetch content of ${filePath}:`,
+              fileContentResponse.statusText
+            );
+          }
         }
       }
-
-
-
-    }
-    else {
+    } else {
       console.error(
         "Failed to fetch commit details:",
         commitResponse.statusText
       );
     }
   } catch (error) {
-    setFailed(`${error}`)
+    setFailed(`${error}`);
   }
-}
+};
 
-run()
+run();
 
 const parseMdxFileContent = async (fileContent: any) => {
   const { data, content } = grayMatter(fileContent);

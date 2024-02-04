@@ -51,14 +51,17 @@ const run = async () => {
                 // if(["README.md"].includes(filePath)){
                 //   return;
                 // }
-                const fileContentResponse = await axios_1.default.get(`https://raw.githubusercontent.com/skarthikeyan96/ga-hashnode-publish/${commitHash}/${customBlogPath}${filePath}`);
-                if (fileContentResponse.status === 200) {
-                    const fileContent = fileContentResponse.data;
-                    console.log("fileContent", fileContent);
-                    parseMdxFileContent(fileContent);
-                }
-                else {
-                    console.error(`Failed to fetch content of ${filePath}:`, fileContentResponse.statusText);
+                if (filePath !== "README.md") {
+                    // later create whitelist file
+                    const fileContentResponse = await axios_1.default.get(`https://raw.githubusercontent.com/skarthikeyan96/ga-hashnode-publish/${commitHash}/${customBlogPath}${filePath}`);
+                    if (fileContentResponse.status === 200) {
+                        const fileContent = fileContentResponse.data;
+                        console.log("fileContent", fileContent);
+                        parseMdxFileContent(fileContent);
+                    }
+                    else {
+                        console.error(`Failed to fetch content of ${filePath}:`, fileContentResponse.statusText);
+                    }
                 }
             }
         }
