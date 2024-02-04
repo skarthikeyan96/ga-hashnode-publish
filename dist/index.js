@@ -30821,7 +30821,7 @@ const run = () => {
     // getting the latest commit
     const commitHash = (0, child_process_1.execSync)("git rev-parse HEAD").toString().trim();
     try {
-        console.log("payload", github_1.context.payload.payload);
+        console.log("payload", github_1.context.payload.commits_url);
     }
     catch (error) {
         console.log("error", error);
