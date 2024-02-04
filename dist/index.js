@@ -19,48 +19,8 @@ const gray_matter_1 = __importDefault(__nccwpck_require__(5382));
 const hashnode_personal_access_token = (0, core_1.getInput)("hashnode-personal-access-token");
 const hashnode_publication_id = (0, core_1.getInput)("hashnode-publication-id");
 const blog_custom_dir = (0, core_1.getInput)("blog-custom-dir");
-const getCommitHash = () => (0, child_process_1.execSync)("git rev-parse HEAD").toString().trim();
-const getCommitDetails = async (username, reponame, commitHash) => {
-    try {
-        return await axios_1.default.get(`https://api.github.com/repos/${username}/${reponame}/commits/${commitHash}`);
-    }
-    catch (error) {
-        throw new Error(`Failed to fetch commit details: ${error}`);
-    }
-};
-const getFileContent = async (username, reponame, commitHash, filePath) => {
-    try {
-        return await axios_1.default.get(`https://raw.githubusercontent.com/skarthikeyan96/ga-hashnode-publish/${commitHash}/${blog_custom_dir}/${filePath}`);
-    }
-    catch (error) {
-        throw new Error(`Failed to fetch content of ${filePath}: ${error}`);
-    }
-};
-const processMarkdownFiles = async (files) => {
-    var _a, _b, _c;
-    if (!files || files.length === 0) {
-        (0, core_1.setFailed)("There are no markdown files in this commit");
-        return;
-    }
-    for (const file of files) {
-        const filePath = file.filename;
-        if (filePath !== "README.md") {
-            try {
-                const fileContentResponse = await getFileContent(((_b = (_a = github_1.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.user) === null || _b === void 0 ? void 0 : _b.login) || "", ((_c = github_1.context.payload.repository) === null || _c === void 0 ? void 0 : _c.name) || "", getCommitHash(), filePath);
-                if (fileContentResponse.status === 200) {
-                    const fileContent = fileContentResponse.data;
-                    console.log("fileContent", fileContent);
-                    parseMdxFileContent(fileContent);
-                }
-            }
-            catch (error) {
-                console.error(error.message);
-            }
-        }
-    }
-};
 const run = async () => {
-    var _a, _b, _c;
+    var _a, _b, _c, _d, _e;
     console.log("hello world");
     if (!hashnode_personal_access_token) {
         (0, core_1.setFailed)("Please add your hashnode personal access token");
@@ -70,13 +30,39 @@ const run = async () => {
         (0, core_1.setFailed)("Please add your hashnode publication id");
         return;
     }
-    const commitHash = getCommitHash();
+    // getting the latest commit
+    const commitHash = (0, child_process_1.execSync)("git rev-parse HEAD").toString().trim();
     try {
-        // const { user, repository } = context.payload.pull_request || { user: { login: "" }, repository: { name: "" } };
-        const commitResponse = await getCommitDetails(((_b = (_a = github_1.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.user) === null || _b === void 0 ? void 0 : _b.login) || "", ((_c = github_1.context.payload.repository) === null || _c === void 0 ? void 0 : _c.name) || "", commitHash);
+        const username = (_c = (_b = (_a = github_1.context === null || github_1.context === void 0 ? void 0 : github_1.context.payload) === null || _a === void 0 ? void 0 : _a.pull_request) === null || _b === void 0 ? void 0 : _b.user) === null || _c === void 0 ? void 0 : _c.login;
+        const reponame = (_e = (_d = github_1.context === null || github_1.context === void 0 ? void 0 : github_1.context.payload) === null || _d === void 0 ? void 0 : _d.repository) === null || _e === void 0 ? void 0 : _e.name;
+        const commitResponse = await axios_1.default.get(`https://api.github.com/repos/${username}/${reponame}/commits/${commitHash}`);
+        const customBlogPath = `${blog_custom_dir}/` || "";
         if (commitResponse.status === 200) {
             const data = commitResponse.data;
-            await processMarkdownFiles(data.files);
+            const markdownFiles = data.files.filter((file) => file.filename.endsWith(".md") || file.filename.endsWith(".mdx"));
+            if (!markdownFiles.length) {
+                (0, core_1.setFailed)("There are no markdown files in this commit");
+                return;
+            }
+            for (const file of markdownFiles) {
+                const filePath = file.filename;
+                // if it falls under any whitelist files do not do anything
+                // if(["README.md"].includes(filePath)){
+                //   return;
+                // }
+                if (filePath !== "README.md") {
+                    // later create whitelist file
+                    const fileContentResponse = await axios_1.default.get(`https://raw.githubusercontent.com/skarthikeyan96/ga-hashnode-publish/${commitHash}/${customBlogPath}${filePath}`);
+                    if (fileContentResponse.status === 200) {
+                        const fileContent = fileContentResponse.data;
+                        console.log("fileContent", fileContent);
+                        parseMdxFileContent(fileContent);
+                    }
+                    else {
+                        console.error(`Failed to fetch content of ${filePath}:`, fileContentResponse.statusText);
+                    }
+                }
+            }
         }
         else {
             console.error("Failed to fetch commit details:", commitResponse.statusText);
@@ -86,9 +72,11 @@ const run = async () => {
         (0, core_1.setFailed)(`${error}`);
     }
 };
+run();
 const parseMdxFileContent = async (fileContent) => {
     const { data, content } = (0, gray_matter_1.default)(fileContent);
-    const { title, subtitle, tags = [] } = data;
+    const { title, subtitle, tags: [], } = data;
+    // parse the content and make it ready for sending to hashnode's server
     const mutation = (0, graphql_request_1.gql) `
     mutation PublishPost($input: PublishPostInput!) {
       publishPost(input: $input) {
@@ -103,9 +91,9 @@ const parseMdxFileContent = async (fileContent) => {
   `;
     const variables = {
         input: {
-            title, // spread the entire front matter
+            title: title, // spread the entire front matter
             publicationId: "5faeafa108f9e538a0136e73", // needs to be constant
-            tags,
+            tags: [],
             contentMarkdown: content,
         },
     };
@@ -113,7 +101,6 @@ const parseMdxFileContent = async (fileContent) => {
     // const results = await graphqlClient.request(mutation, variables);
     // console.log(results);
 };
-run();
 
 
 /***/ }),
