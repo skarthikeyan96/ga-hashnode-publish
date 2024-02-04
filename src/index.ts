@@ -2,6 +2,8 @@ import { getInput, setFailed } from "@actions/core";
 import { execSync } from "child_process";
 import { context, getOctokit } from "@actions/github";
 import axios from "axios";
+import { GraphQLClient, gql } from "graphql-request";
+import grayMatter from "gray-matter";
 
 const hashnode_personal_access_token = getInput(
   "hashnode-personal-access-token"
@@ -45,10 +47,38 @@ const run = async () => {
         return;
       }
 
-      
+      for (const file of markdownFiles) {
+        const filePath = file.filename;
+
+        // if it falls under any whitelist files do not do anything
+        if(["README.md"].includes(filePath)){
+          return;
+        }
+
+        const fileContentResponse = await axios.get(
+          `https://raw.githubusercontent.com/skarthikeyan96/ga-hashnode-publish/${commitHash}/${customBlogPath}${filePath}`
+        );
+
+        if (fileContentResponse.status === 200) {
+          const fileContent = fileContentResponse.data;
+          console.log("fileContent", fileContent)
+          parseMdxFileContent(fileContent);
+        } else {
+          console.error(
+            `Failed to fetch content of ${filePath}:`,
+            fileContentResponse.statusText
+          );
+        }
+      }
 
 
 
+    }
+    else {
+      console.error(
+        "Failed to fetch commit details:",
+        commitResponse.statusText
+      );
     }
   } catch (error) {
     setFailed(`${error}`)
@@ -56,3 +86,42 @@ const run = async () => {
 }
 
 run()
+
+const parseMdxFileContent = async (fileContent: any) => {
+  const { data, content } = grayMatter(fileContent);
+
+  const {
+    title,
+    subtitle,
+    tags: [],
+  } = data;
+
+  // parse the content and make it ready for sending to hashnode's server
+
+  const mutation = gql`
+    mutation PublishPost($input: PublishPostInput!) {
+      publishPost(input: $input) {
+        post {
+          id
+          slug
+          title
+          subtitle
+        }
+      }
+    }
+  `;
+
+  const variables = {
+    input: {
+      title: title, // spread the entire front matter
+      publicationId: "5faeafa108f9e538a0136e73", // needs to be constant
+      tags: [],
+      contentMarkdown: content,
+    },
+  };
+
+  console.log(title);
+
+  // const results = await graphqlClient.request(mutation, variables);
+  // console.log(results);
+};
