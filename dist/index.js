@@ -34,10 +34,15 @@ const run = async () => {
         const username = (_c = (_b = (_a = github_1.context === null || github_1.context === void 0 ? void 0 : github_1.context.payload) === null || _a === void 0 ? void 0 : _a.pull_request) === null || _b === void 0 ? void 0 : _b.user) === null || _c === void 0 ? void 0 : _c.login;
         const reponame = (_e = (_d = github_1.context === null || github_1.context === void 0 ? void 0 : github_1.context.payload) === null || _d === void 0 ? void 0 : _d.repository) === null || _e === void 0 ? void 0 : _e.name;
         const commitResponse = await axios_1.default.get(`https://api.github.com/repos/${username}/${reponame}/commits/${commitHash}`);
-        console.log("commit response", commitResponse);
+        const customBlogPath = `${blog_custom_dir}/` || "";
+        if (commitResponse.status === 200) {
+            const data = commitResponse.data;
+            const markdownFiles = data.files.filter((file) => file.filename.endsWith(".md") || file.filename.endsWith(".mdx"));
+            console.log("markdownFiles", markdownFiles);
+        }
     }
     catch (error) {
-        console.log("error", error);
+        (0, core_1.setFailed)(`${error}`);
     }
 };
 run();

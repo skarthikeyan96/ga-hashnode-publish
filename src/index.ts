@@ -28,9 +28,21 @@ const run = async () => {
     const commitResponse = await axios.get(
       `https://api.github.com/repos/${username}/${reponame}/commits/${commitHash}`
     );
-    console.log("commit response", commitResponse)
+    const customBlogPath = `${blog_custom_dir}/` || "";
+    
+    if (commitResponse.status === 200) {
+      const data = commitResponse.data;
+
+      const markdownFiles = data.files.filter(
+        (file: { filename: string }) =>
+          file.filename.endsWith(".md") || file.filename.endsWith(".mdx")
+      );
+
+      console.log("markdownFiles", markdownFiles)
+
+    }
   } catch (error) {
-    console.log("error", error)
+    setFailed(`${error}`)
   }
 }
 
