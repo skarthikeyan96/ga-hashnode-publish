@@ -11,38 +11,47 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(2186);
-const github_1 = __nccwpck_require__(5438);
 const child_process_1 = __nccwpck_require__(2081);
+const github_1 = __nccwpck_require__(5438);
 const axios_1 = __importDefault(__nccwpck_require__(8757));
-const gray_matter_1 = __importDefault(__nccwpck_require__(5382));
 const graphql_request_1 = __nccwpck_require__(5406);
+const gray_matter_1 = __importDefault(__nccwpck_require__(5382));
 const hashnode_personal_access_token = (0, core_1.getInput)("hashnode-personal-access-token");
-const graphqlClient = new graphql_request_1.GraphQLClient("https://gql.hashnode.com/", {
-    headers: {
-        Authorization: hashnode_personal_access_token || "",
-    },
-});
+const hashnode_publication_id = (0, core_1.getInput)("hashnode-publication-id");
+const blog_custom_dir = (0, core_1.getInput)("blog-custom-dir");
 const run = async () => {
-    //   const gh_token = getInput("gh-token");
-    const hashnode_publication_id = (0, core_1.getInput)("hashnode-publication-id");
-    const blog_custom_dir = (0, core_1.getInput)("blog-custom-dir");
+    var _a, _b, _c, _d, _e;
+    console.log("hello world");
+    if (!hashnode_personal_access_token) {
+        (0, core_1.setFailed)("Please add your hashnode personal access token");
+        return;
+    }
+    if (!hashnode_publication_id) {
+        (0, core_1.setFailed)("Please add your hashnode publication id");
+        return;
+    }
+    // getting the latest commit
     const commitHash = (0, child_process_1.execSync)("git rev-parse HEAD").toString().trim();
     try {
-        // const commitUrl = context.payload.commits[0].url;
-        // const username = commitUrl.split("/")[2];
-        // const reponame = commitUrl.split("/")[3];
-        // 
-        console.log("payload", github_1.context.payload.pull_request);
-        const commitResponse = await axios_1.default.get(`https://api.github.com/repos/skarthikeyan96/ga-hashnode-publish/commits/${commitHash}`);
+        const username = (_c = (_b = (_a = github_1.context === null || github_1.context === void 0 ? void 0 : github_1.context.payload) === null || _a === void 0 ? void 0 : _a.pull_request) === null || _b === void 0 ? void 0 : _b.user) === null || _c === void 0 ? void 0 : _c.login;
+        const reponame = (_e = (_d = github_1.context === null || github_1.context === void 0 ? void 0 : github_1.context.payload) === null || _d === void 0 ? void 0 : _d.repository) === null || _e === void 0 ? void 0 : _e.name;
+        const commitResponse = await axios_1.default.get(`https://api.github.com/repos/${username}/${reponame}/commits/${commitHash}`);
         const customBlogPath = `${blog_custom_dir}/` || "";
         if (commitResponse.status === 200) {
             const data = commitResponse.data;
             const markdownFiles = data.files.filter((file) => file.filename.endsWith(".md") || file.filename.endsWith(".mdx"));
+            if (!markdownFiles.length) {
+                (0, core_1.setFailed)("There are no markdown files in this commit");
+                return;
+            }
             for (const file of markdownFiles) {
                 const filePath = file.filename;
-                console.log("filePath", filePath);
-                if (filePath !== "README.md") // later create whitelist file
-                 {
+                // if it falls under any whitelist files do not do anything
+                // if(["README.md"].includes(filePath)){
+                //   return;
+                // }
+                if (filePath !== "README.md") {
+                    // later create whitelist file
                     const fileContentResponse = await axios_1.default.get(`https://raw.githubusercontent.com/skarthikeyan96/ga-hashnode-publish/${commitHash}/${customBlogPath}${filePath}`);
                     if (fileContentResponse.status === 200) {
                         const fileContent = fileContentResponse.data;
@@ -60,9 +69,10 @@ const run = async () => {
         }
     }
     catch (error) {
-        console.error("Error:", error);
+        (0, core_1.setFailed)(`${error}`);
     }
 };
+run();
 const parseMdxFileContent = async (fileContent) => {
     const { data, content } = (0, gray_matter_1.default)(fileContent);
     const { title, subtitle, tags: [], } = data;
@@ -88,10 +98,9 @@ const parseMdxFileContent = async (fileContent) => {
         },
     };
     console.log(title);
-    const results = await graphqlClient.request(mutation, variables);
-    console.log(results);
+    // const results = await graphqlClient.request(mutation, variables);
+    // console.log(results);
 };
-run();
 
 
 /***/ }),
@@ -8737,7 +8746,7 @@ exports.execute = execute;
 exports.executeSync = executeSync;
 exports.getFieldDef = getFieldDef;
 
-var _devAssert = __nccwpck_require__(946);
+var _devAssert = __nccwpck_require__(6514);
 
 var _inspect = __nccwpck_require__(102);
 
@@ -9934,7 +9943,7 @@ Object.defineProperty(exports, "__esModule", ({
 exports.createSourceEventStream = createSourceEventStream;
 exports.subscribe = subscribe;
 
-var _devAssert = __nccwpck_require__(946);
+var _devAssert = __nccwpck_require__(6514);
 
 var _inspect = __nccwpck_require__(102);
 
@@ -10494,7 +10503,7 @@ Object.defineProperty(exports, "__esModule", ({
 exports.graphql = graphql;
 exports.graphqlSync = graphqlSync;
 
-var _devAssert = __nccwpck_require__(946);
+var _devAssert = __nccwpck_require__(6514);
 
 var _isPromise = __nccwpck_require__(3910);
 
@@ -11904,7 +11913,7 @@ function pathToArray(path) {
 
 /***/ }),
 
-/***/ 946:
+/***/ 6514:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -17167,7 +17176,7 @@ Object.defineProperty(exports, "__esModule", ({
 exports.Source = void 0;
 exports.isSource = isSource;
 
-var _devAssert = __nccwpck_require__(946);
+var _devAssert = __nccwpck_require__(6514);
 
 var _inspect = __nccwpck_require__(102);
 
@@ -17294,7 +17303,7 @@ exports.getVisitFn = getVisitFn;
 exports.visit = visit;
 exports.visitInParallel = visitInParallel;
 
-var _devAssert = __nccwpck_require__(946);
+var _devAssert = __nccwpck_require__(6514);
 
 var _inspect = __nccwpck_require__(102);
 
@@ -17676,7 +17685,7 @@ Object.defineProperty(exports, "__esModule", ({
 exports.assertEnumValueName = assertEnumValueName;
 exports.assertName = assertName;
 
-var _devAssert = __nccwpck_require__(946);
+var _devAssert = __nccwpck_require__(6514);
 
 var _GraphQLError = __nccwpck_require__(4797);
 
@@ -17792,7 +17801,7 @@ exports.isWrappingType = isWrappingType;
 exports.resolveObjMapThunk = resolveObjMapThunk;
 exports.resolveReadonlyArrayThunk = resolveReadonlyArrayThunk;
 
-var _devAssert = __nccwpck_require__(946);
+var _devAssert = __nccwpck_require__(6514);
 
 var _didYouMean = __nccwpck_require__(2878);
 
@@ -19099,7 +19108,7 @@ exports.isDirective = isDirective;
 exports.isSpecifiedDirective = isSpecifiedDirective;
 exports.specifiedDirectives = void 0;
 
-var _devAssert = __nccwpck_require__(946);
+var _devAssert = __nccwpck_require__(6514);
 
 var _inspect = __nccwpck_require__(102);
 
@@ -20880,7 +20889,7 @@ exports.GraphQLSchema = void 0;
 exports.assertSchema = assertSchema;
 exports.isSchema = isSchema;
 
-var _devAssert = __nccwpck_require__(946);
+var _devAssert = __nccwpck_require__(6514);
 
 var _inspect = __nccwpck_require__(102);
 
@@ -22399,7 +22408,7 @@ Object.defineProperty(exports, "__esModule", ({
 exports.assertValidName = assertValidName;
 exports.isValidNameError = isValidNameError;
 
-var _devAssert = __nccwpck_require__(946);
+var _devAssert = __nccwpck_require__(6514);
 
 var _GraphQLError = __nccwpck_require__(4797);
 
@@ -22656,7 +22665,7 @@ Object.defineProperty(exports, "__esModule", ({
 exports.buildASTSchema = buildASTSchema;
 exports.buildSchema = buildSchema;
 
-var _devAssert = __nccwpck_require__(946);
+var _devAssert = __nccwpck_require__(6514);
 
 var _kinds = __nccwpck_require__(1927);
 
@@ -22778,7 +22787,7 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports.buildClientSchema = buildClientSchema;
 
-var _devAssert = __nccwpck_require__(946);
+var _devAssert = __nccwpck_require__(6514);
 
 var _inspect = __nccwpck_require__(102);
 
@@ -23404,7 +23413,7 @@ Object.defineProperty(exports, "__esModule", ({
 exports.extendSchema = extendSchema;
 exports.extendSchemaImpl = extendSchemaImpl;
 
-var _devAssert = __nccwpck_require__(946);
+var _devAssert = __nccwpck_require__(6514);
 
 var _inspect = __nccwpck_require__(102);
 
@@ -27065,7 +27074,7 @@ var _OverlappingFieldsCanBeMergedRule = __nccwpck_require__(3577);
 
 var _PossibleFragmentSpreadsRule = __nccwpck_require__(2450);
 
-var _ProvidedRequiredArgumentsRule = __nccwpck_require__(2903);
+var _ProvidedRequiredArgumentsRule = __nccwpck_require__(7669);
 
 var _ScalarLeafsRule = __nccwpck_require__(6830);
 
@@ -29362,7 +29371,7 @@ function extensionKindToTypeName(kind) {
 
 /***/ }),
 
-/***/ 2903:
+/***/ 7669:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -31170,7 +31179,7 @@ var _PossibleFragmentSpreadsRule = __nccwpck_require__(2450);
 
 var _PossibleTypeExtensionsRule = __nccwpck_require__(75);
 
-var _ProvidedRequiredArgumentsRule = __nccwpck_require__(2903);
+var _ProvidedRequiredArgumentsRule = __nccwpck_require__(7669);
 
 var _ScalarLeafsRule = __nccwpck_require__(6830);
 
@@ -31309,7 +31318,7 @@ exports.assertValidSDLExtension = assertValidSDLExtension;
 exports.validate = validate;
 exports.validateSDL = validateSDL;
 
-var _devAssert = __nccwpck_require__(946);
+var _devAssert = __nccwpck_require__(6514);
 
 var _GraphQLError = __nccwpck_require__(4797);
 
@@ -31749,7 +31758,7 @@ module.exports = function(options) {
 
 /***/ }),
 
-/***/ 7669:
+/***/ 540:
 /***/ ((module) => {
 
 "use strict";
@@ -31895,7 +31904,7 @@ module.exports = function(file, options) {
 "use strict";
 
 
-const getEngine = __nccwpck_require__(7669);
+const getEngine = __nccwpck_require__(540);
 const defaults = __nccwpck_require__(5256);
 
 module.exports = function(language, str, options) {
@@ -31917,7 +31926,7 @@ module.exports = function(language, str, options) {
 
 
 const typeOf = __nccwpck_require__(6961);
-const getEngine = __nccwpck_require__(7669);
+const getEngine = __nccwpck_require__(540);
 const defaults = __nccwpck_require__(5256);
 
 module.exports = function(file, data, options) {
@@ -32154,7 +32163,7 @@ function deprecated(name) {
 
 
 module.exports.Type = __nccwpck_require__(967);
-module.exports.Schema = __nccwpck_require__(6514);
+module.exports.Schema = __nccwpck_require__(8415);
 module.exports.FAILSAFE_SCHEMA = __nccwpck_require__(6037);
 module.exports.JSON_SCHEMA = __nccwpck_require__(1571);
 module.exports.CORE_SCHEMA = __nccwpck_require__(4537);
@@ -34894,7 +34903,7 @@ module.exports = Mark;
 
 /***/ }),
 
-/***/ 6514:
+/***/ 8415:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
@@ -35024,7 +35033,7 @@ module.exports = Schema;
 
 
 
-var Schema = __nccwpck_require__(6514);
+var Schema = __nccwpck_require__(8415);
 
 
 module.exports = new Schema({
@@ -35052,7 +35061,7 @@ module.exports = new Schema({
 
 
 
-var Schema = __nccwpck_require__(6514);
+var Schema = __nccwpck_require__(8415);
 
 
 module.exports = Schema.DEFAULT = new Schema({
@@ -35083,7 +35092,7 @@ module.exports = Schema.DEFAULT = new Schema({
 
 
 
-var Schema = __nccwpck_require__(6514);
+var Schema = __nccwpck_require__(8415);
 
 
 module.exports = new Schema({
@@ -35116,7 +35125,7 @@ module.exports = new Schema({
 
 
 
-var Schema = __nccwpck_require__(6514);
+var Schema = __nccwpck_require__(8415);
 
 
 module.exports = new Schema({
@@ -35145,7 +35154,7 @@ module.exports = new Schema({
 
 
 
-var Schema = __nccwpck_require__(6514);
+var Schema = __nccwpck_require__(8415);
 
 
 module.exports = new Schema({
