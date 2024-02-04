@@ -30805,8 +30805,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(2186);
 const child_process_1 = __nccwpck_require__(2081);
 const github_1 = __nccwpck_require__(5438);
-const hashnode_personal_access_token = (0, core_1.getInput)("hashnode-personal-access-token") || "a77913ab-d2cd-4c0d-aec8-aa5a2f71ada7";
-const hashnode_publication_id = (0, core_1.getInput)("hashnode-publication-id") || "5faeafa108f9e538a0136e73";
+const hashnode_personal_access_token = (0, core_1.getInput)("hashnode-personal-access-token");
+const hashnode_publication_id = (0, core_1.getInput)("hashnode-publication-id");
 const blog_custom_dir = (0, core_1.getInput)("blog-custom-dir");
 const run = () => {
     console.log("hello world");
@@ -30821,7 +30821,7 @@ const run = () => {
     // getting the latest commit
     const commitHash = (0, child_process_1.execSync)("git rev-parse HEAD").toString().trim();
     try {
-        console.log("payload", github_1.context.payload);
+        console.log("payload", github_1.context.payload.payload.commits_url);
     }
     catch (error) {
         console.log("error", error);
