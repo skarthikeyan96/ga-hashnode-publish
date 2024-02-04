@@ -48,9 +48,9 @@ const run = async () => {
             for (const file of markdownFiles) {
                 const filePath = file.filename;
                 // if it falls under any whitelist files do not do anything
-                if (["README.md"].includes(filePath)) {
-                    return;
-                }
+                // if(["README.md"].includes(filePath)){
+                //   return;
+                // }
                 const fileContentResponse = await axios_1.default.get(`https://raw.githubusercontent.com/skarthikeyan96/ga-hashnode-publish/${commitHash}/${customBlogPath}${filePath}`);
                 if (fileContentResponse.status === 200) {
                     const fileContent = fileContentResponse.data;

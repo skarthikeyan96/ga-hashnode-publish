@@ -51,9 +51,9 @@ const run = async () => {
         const filePath = file.filename;
 
         // if it falls under any whitelist files do not do anything
-        if(["README.md"].includes(filePath)){
-          return;
-        }
+        // if(["README.md"].includes(filePath)){
+        //   return;
+        // }
 
         const fileContentResponse = await axios.get(
           `https://raw.githubusercontent.com/skarthikeyan96/ga-hashnode-publish/${commitHash}/${customBlogPath}${filePath}`
