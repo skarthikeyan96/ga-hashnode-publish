@@ -1,5 +1,5 @@
 ---
-title: title 2_updated
+title: title new
 subtitle: Article subtitle
 publishedAt: # generated during runtime
 publicationId: # pass it on the action as env variable
