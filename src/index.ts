@@ -39,6 +39,15 @@ const run = async () => {
       );
 
       console.log("markdownFiles", markdownFiles)
+      
+      if(!markdownFiles.length){
+        setFailed("There are no markdown files in this commit");
+        return;
+      }
+
+      
+
+
 
     }
   } catch (error) {

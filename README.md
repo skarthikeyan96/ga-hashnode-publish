@@ -1,5 +1,5 @@
 # user-to-do
-- enable `Read and write permissions`
+- enable `Read and write permissions `
 
 
 # development to do's

@@ -39,6 +39,10 @@ const run = async () => {
             const data = commitResponse.data;
             const markdownFiles = data.files.filter((file) => file.filename.endsWith(".md") || file.filename.endsWith(".mdx"));
             console.log("markdownFiles", markdownFiles);
+            if (!markdownFiles.length) {
+                (0, core_1.setFailed)("There are no markdown files in this commit");
+                return;
+            }
         }
     }
     catch (error) {
