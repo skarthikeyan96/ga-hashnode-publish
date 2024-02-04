@@ -30809,6 +30809,7 @@ const hashnode_personal_access_token = (0, core_1.getInput)("hashnode-personal-a
 const hashnode_publication_id = (0, core_1.getInput)("hashnode-publication-id");
 const blog_custom_dir = (0, core_1.getInput)("blog-custom-dir");
 const run = () => {
+    var _a, _b;
     console.log("hello world");
     if (!hashnode_personal_access_token) {
         (0, core_1.setFailed)("Please add your hashnode personal access token");
@@ -30821,7 +30822,7 @@ const run = () => {
     // getting the latest commit
     const commitHash = (0, child_process_1.execSync)("git rev-parse HEAD").toString().trim();
     try {
-        console.log("payload ->", github_1.context.payload);
+        console.log("payload ->", (_b = (_a = github_1.context === null || github_1.context === void 0 ? void 0 : github_1.context.payload) === null || _a === void 0 ? void 0 : _a.pull_request) === null || _b === void 0 ? void 0 : _b.commits_url);
     }
     catch (error) {
         console.log("error", error);

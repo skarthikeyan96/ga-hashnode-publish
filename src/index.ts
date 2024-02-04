@@ -22,7 +22,7 @@ const run = () => {
   const commitHash = execSync("git rev-parse HEAD").toString().trim();
 
   try {
-    console.log("payload ->", context.payload)
+    console.log("payload ->", context?.payload?.pull_request?.commits_url)
   } catch (error) {
     console.log("error", error)
   }
