@@ -19,6 +19,7 @@ jobs:
         with:
           gh-token: ${{secrets.GITHUB_TOKEN}}
           hashnode-personal-access-token: ${{secrets.HASHNODE_PERSONAL_ACCESS_TOKEN}}
+          hashnode-publication-id: ${{secrets.HASHNODE_PUBLICATION_ID}}
           # blog-custom-dir: "blogs"
       # - name: 'Comment on PR' # else block if the md files are not present
       #   uses: actions/github-script@v7
