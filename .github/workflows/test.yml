@@ -1,16 +1,33 @@
 name: "Post blog to hashnode"
 
-on:
-  push:
-    branches: [ "main" ]
+on: pull_request
    
 jobs:
   hello:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./
+      - uses: dorny/paths-filter@v2.2.1
+        id: filter
+        with:
+          filters: |
+            md:
+              - '**/*.md'
+      - name: 'Publish blog post'
+        if: steps.filter.outputs.md == 'true'
+        uses: ./
         with:
           gh-token: ${{secrets.GITHUB_TOKEN}}
           hashnode-personal-access-token: ${{secrets.HASHNODE_PERSONAL_ACCESS_TOKEN}}
           # blog-custom-dir: "blogs"
+      - name: 'Comment on PR' # else block if the md files are not present
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '👋 Thanks for reporting!'
+            })
+         
